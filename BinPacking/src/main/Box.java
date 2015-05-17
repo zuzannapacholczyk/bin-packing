@@ -6,12 +6,14 @@ public class Box extends Container{
 	 * 	-1 oznacza, ze jest poza kontenerem
 	 *  polozenie w kontenerze
 	 */
+	public int id;
 	private int x = -1;
 	private int y = -1;
 	private int z = -1;
 	
-	public Box(int height, int width, int length) {
+	public Box(int id, int height, int width, int length) {
 		super(height, width, length);
+		this.id = id;
 	}
 	
 	public void setInContainer(int x, int y, int z) {

@@ -11,7 +11,7 @@ public class Container {
 		this.setWidth(width);
 	}
 
-	public int CountVolume() {
+	public int getVolume() {
 		return this.getHeight() * this.getWidth() * this.getLength();
 	}
 
