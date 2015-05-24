@@ -13,10 +13,10 @@ public class TabuSolution {
 
 	private void generateData(int numberOfBoxes) {
 		Random generator = new Random();
-//		container = new Container((generator.nextInt(100) + 1) * 10,
-//				(generator.nextInt(100) + 1) * 10,
-//				(generator.nextInt(100) + 1) * 10);
-		container = new Container (120,20,120);
+		// container = new Container((generator.nextInt(100) + 1) * 10,
+		// (generator.nextInt(100) + 1) * 10,
+		// (generator.nextInt(100) + 1) * 10);
+		container = new Container(120, 20, 120);
 		boxesOutsideContainer = new ArrayList<Box>();
 		int id = 1;
 		int height = generator.nextInt(50) + 1;
@@ -41,52 +41,43 @@ public class TabuSolution {
 
 		System.out.println("container");
 		System.out.println("h: " + Integer.toString(container.getHeight())
-				+ " l: " + Integer.toString(container.getLength()) + "w: "
+				+ " l: " + Integer.toString(container.getLength()) + " w: "
 				+ Integer.toString(container.getWidth()));
-		
+
 		System.out.println("after sort");
 		for (Box box : boxesOutsideContainer) {
 			System.out.println("h: " + Integer.toString(box.getHeight())
-					+ " l: " + Integer.toString(box.getLength()) + "w: "
+					+ " l: " + Integer.toString(box.getLength()) + " w: "
 					+ Integer.toString(box.getWidth()));
 		}
 		boxesInsideContainer = new ArrayList<Box>();
 		createSolution();
-//		System.out.println("outside after solution");
-//		if (!boxesOutsideContainer.isEmpty())
-//			for (Box box : boxesOutsideContainer) {
-//				System.out.println("h: " + Integer.toString(box.getHeight())
-//						+ " l: " + Integer.toString(box.getLength()) + "w: "
-//						+ Integer.toString(box.getWidth()));
-//			}
+		System.out.println("outside after solution");
+		if (!boxesOutsideContainer.isEmpty())
+			for (Box box : boxesOutsideContainer) {
+				System.out.println("h: " + Integer.toString(box.getHeight())
+						+ " l: " + Integer.toString(box.getLength()) + " w: "
+						+ Integer.toString(box.getWidth()));
+			}
 
 		System.out.println("\n inside after solution");
 		if (!boxesInsideContainer.isEmpty())
 			for (Box box : boxesInsideContainer) {
 				System.out.println("h: " + Integer.toString(box.getHeight())
-						+ " l: " + Integer.toString(box.getLength()) + "w: "
+						+ " l: " + Integer.toString(box.getLength()) + " w: "
 						+ Integer.toString(box.getWidth()));
 			}
 	}
 
-	public boolean checkIfBoxFitsInsideContainer(Point corner, int boxId) {
-		if (corner.getX() + getOutsideBoxWithId(boxId).getLength() <= container
-				.getLength())
-			if (corner.getY() + getOutsideBoxWithId(boxId).getHeight() <= container
-					.getHeight())
-				if (corner.getZ() + getOutsideBoxWithId(boxId).getWidth() <= container
-						.getWidth())
-					return true;
-		return false;
-	}
-
 	public void createSolution() {
+		List<Box> keepToRemove = new ArrayList<Box>();
 		for (Box outsideBox : boxesOutsideContainer) {
 			if (getInsideBoxWithId(outsideBox.getId()) == null) {
 				if (boxesInsideContainer.isEmpty()) {
 					if (checkIfBoxFitsInsideContainer(new Point(0, 0, 0),
 							outsideBox.getId())) {
 						// boxesOutsideContainer.remove(outsideBox);
+						keepToRemove.add(outsideBox);
 						outsideBox.setInContainer(0, 0, 0);
 						boxesInsideContainer.add(outsideBox);
 					}
@@ -94,27 +85,61 @@ public class TabuSolution {
 					Box checkBox = getInsideBoxWithXYZ(new Point(0, 0, 0));
 					Box earlierCheckBox = new Box();
 					Point iterator = new Point(0, 0, 0);
-					
-					while (iterator.getZ() <= container.getWidth() && checkBox.getId() != earlierCheckBox.getId()) {
-						while (iterator.getY() <= container.getHeight() && checkBox.getId() != earlierCheckBox.getId()) {
-							while (iterator.getX() <= container.getLength() && checkBox.getId() != earlierCheckBox.getId()) {
+
+					while (iterator.getZ() <= container.getWidth()
+							&& checkBox.getId() != earlierCheckBox.getId()) {
+						while (iterator.getY() <= container.getHeight()
+								&& checkBox.getId() != earlierCheckBox.getId()) {
+							while (iterator.getX() <= container.getLength()
+									&& checkBox.getId() != earlierCheckBox
+											.getId()) {
 								earlierCheckBox = checkBox;
-								if (checkBox.getRightId() == -1 && checkBox.getAboveId() == -1 && checkBox.getPrzedId() == -1) {
+								if (checkBox.getRightId() == -1
+										&& checkBox.getAboveId() == -1
+										&& checkBox.getInFrontId() == -1) {
 									Point newPlace = new Point(checkBox
 											.getPlaceInContainer().getX()
 											+ checkBox.getLength(), checkBox
 											.getPlaceInContainer().getY(),
 											checkBox.getPlaceInContainer()
 													.getZ());
+
+									newPlace = checkIfFitsToOtherBoxes(
+											outsideBox, newPlace);
+
 									if (checkIfBoxFitsInsideContainer(newPlace,
 											outsideBox.getId())) {
 										// boxesOutsideContainer.remove(outsideBox);
+										keepToRemove.add(outsideBox);
 										outsideBox.setInContainer(newPlace);
 										outsideBox.setLeftId(checkBox.getId());
+										Box currentBox = new Box();
+										// getBoxBehind
+										Point currentPoint = newPlace;
+										currentPoint.setZ(newPlace.getZ() - 1);
+										currentBox = getInsideBoxWithXYZ(currentPoint);
+										if (currentBox != null) {
+											currentBox.setInFrontId(outsideBox
+													.getId());
+											outsideBox.setBehindId(currentBox
+													.getId());
+										}
+
+										// getBoxUnder
+										currentPoint = newPlace;
+										currentPoint.setY(newPlace.getY() - 1);
+										currentBox = getInsideBoxWithXYZ(currentPoint);
+										if (currentBox != null) {
+											currentBox.setAboveId(outsideBox
+													.getId());
+											outsideBox.setUnderId(currentBox
+													.getId());
+										}
+
 										checkBox.setRightId(outsideBox.getId());
 										boxesInsideContainer.add(outsideBox);
 									}
-									
+
 								} else {
 									checkBox = getInsideBoxWithId(checkBox
 											.getRightId());
@@ -133,6 +158,67 @@ public class TabuSolution {
 				}
 			}
 		}
+		boxesOutsideContainer.removeAll(keepToRemove);
+	}
+
+	private Point checkIfFitsToOtherBoxes(Box outsideBox, Point newPlace) {
+
+		int i = 0;
+		int j = 0;
+		Point resultOfCheck = newPlace;
+		while (i < 3) {
+			if (i == 0)
+				resultOfCheck.setY(resultOfCheck.getY());
+			if (i == 1)
+				resultOfCheck.setY(resultOfCheck.getY()
+						+ (outsideBox.getHeight() / 2));
+			if (i == 2)
+				resultOfCheck.setY(resultOfCheck.getY()
+						+ (outsideBox.getHeight()));
+			while (j < 3) {
+				resultOfCheck = newPlace;
+				if (j == 0)
+					resultOfCheck.setX(resultOfCheck.getX());
+				if (j == 1)
+					resultOfCheck.setX(resultOfCheck.getX()
+							+ (outsideBox.getLength() / 2));
+				if (j == 2)
+					resultOfCheck.setX(resultOfCheck.getX()
+							+ (outsideBox.getLength()));
+				resultOfCheck = checkIfBoxesBehindFit(resultOfCheck);
+
+				if (resultOfCheck != new Point(-1, -1, -1)) {
+					newPlace = resultOfCheck;
+				}
+				j++;
+			}
+			i++;
+		}
+
+		return newPlace;
+	}
+
+	public boolean checkIfBoxFitsInsideContainer(Point corner, int boxId) {
+		if (corner.getX() + getOutsideBoxWithId(boxId).getLength() <= container
+				.getLength())
+			if (corner.getY() + getOutsideBoxWithId(boxId).getHeight() <= container
+					.getHeight())
+				if (corner.getZ() + getOutsideBoxWithId(boxId).getWidth() <= container
+						.getWidth())
+					return true;
+		return false;
+	}
+
+	public Point checkIfBoxesBehindFit(Point corner) {
+		Box boxBehind = getInsideBoxWithXYZ(corner);
+		Point newCorner = new Point(-1, -1, -1);
+		int newCornerZ;
+		if (boxBehind != null) {
+			newCornerZ = boxBehind.getPlaceInContainer().getZ()
+					+ boxBehind.getWidth();
+			newCorner.setZ(newCornerZ);
+		}
+		return newCorner;
 	}
 
 	public Box getOutsideBoxWithId(int id) {

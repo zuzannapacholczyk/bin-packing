@@ -15,7 +15,7 @@ public class Box extends Container {
 	private int rightId = -1;
 	private int leftId = -1;
 	private int behindId = -1;
-	private int przedId = -1;
+	private int inFrontId = -1;
 	
 	public Box() {
 		this.id = -1;
@@ -86,11 +86,11 @@ public class Box extends Container {
 		this.behindId = behindId;
 	}
 
-	public int getPrzedId() {
-		return przedId;
+	public int getInFrontId() {
+		return inFrontId;
 	}
 
-	public void setPrzedId(int przedId) {
-		this.przedId = przedId;
+	public void setInFrontId(int inFrontId) {
+		this.inFrontId = inFrontId;
 	}
 }
