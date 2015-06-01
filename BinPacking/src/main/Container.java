@@ -7,6 +7,12 @@ public class Container {
 
 	public Container() {}
 	
+	public Container(Container other) {
+		height = other.height;
+		width = other.width;
+		length = other.length;
+	}
+	
 	public Container(int height, int width, int length) {
 		this.setHeight(height);
 		this.setLength(length);
