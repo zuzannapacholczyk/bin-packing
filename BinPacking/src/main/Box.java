@@ -1,14 +1,14 @@
 package main;
 
-public class Box extends Container {
+public class Box extends Container implements Cloneable {
 
 	/**
 	 * -1 oznacza, ze jest poza kontenerem polozenie w kontenerze
 	 */
 	public int id;
-	private int x = -1;
-	private int y = -1;
-	private int z = -1;
+	private int x;
+	private int y;
+	private int z;
 
 	private int aboveId = -1;
 	private int underId = -1;
@@ -17,13 +17,44 @@ public class Box extends Container {
 	private int behindId = -1;
 	private int inFrontId = -1;
 	
+	void resetIds() {
+		x = -1;
+		y = -1;
+		z = -1;
+
+		aboveId = -1;
+		underId = -1;
+		rightId = -1;
+		leftId = -1;
+		behindId = -1;
+		inFrontId = -1;
+	}
+	
+	
+	public Box(Box other) {
+		super(other.getHeight(),other.getWidth(),other.getLength());
+		id = other.getId();
+		x = other.x;
+		y = other.y;
+		z = other.z;
+		
+		aboveId = other.aboveId;
+		underId = other.underId;
+		rightId = other.rightId;
+		leftId = other.leftId;
+		behindId = other.behindId;
+		inFrontId = other.inFrontId;
+	}
+	
 	public Box() {
 		this.id = -1;
+		resetIds();
 	}
 	
 	public Box(int id, int height, int width, int length) {
 		super(height, width, length);
 		this.id = id;
+		resetIds();
 	}
 
 	public void setInContainer(int x, int y, int z) {
